@@ -5,7 +5,7 @@ include_once('model.php');
 include_once('test.php');
 
 $conn = get_connect();
-
+init_db($conn);
 // Uncomment to see data in db
 //run_db_test($conn);
   
