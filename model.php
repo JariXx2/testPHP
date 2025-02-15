@@ -28,8 +28,37 @@ function get_users($conn)
 /**
  * Return transactions balances of given user.
  */
-function get_user_transactions_balances($user_id, $conn)
+function get_user_transactions_balances($user_id, $conn, $month_names)
 {
-    // TODO: implement
-    return [];
+    // SQL query to get the monthly balance of a user, 
+    // taking into account that he may have several accounts.
+    $sql = "
+        SELECT 
+            strftime('%m', t.trdate) AS month,
+            SUM(CASE WHEN ua.id = t.account_to THEN t.amount ELSE 0 END) AS incoming,
+            SUM(CASE WHEN ua.id = t.account_from THEN t.amount ELSE 0 END) AS outgoing
+        FROM transactions t
+        INNER JOIN user_accounts ua ON ua.id = t.account_from OR ua.id = t.account_to
+        WHERE ua.user_id = :user_id
+        GROUP BY month
+    ";
+
+    // Request preparation
+    $stmt = $conn->prepare($sql);
+
+    // Binding a parameter
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+
+    // Request Execution
+    $stmt->execute();
+
+    // Getting results
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Filtering results to account for only months from $month_names
+    $filtered_result = array_filter($result, function ($item) use ($month_names) {
+        return array_key_exists($item['month'], $month_names);
+    });
+
+    return $filtered_result;
 }
