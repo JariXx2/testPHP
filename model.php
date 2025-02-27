@@ -35,12 +35,14 @@ function get_user_transactions_balances($user_id, $conn, $month_names)
     $sql = "
         SELECT 
             strftime('%m', t.trdate) AS month,
+            COUNT(DISTINCT strftime('%Y-%m-%d', t.trdate)) AS days,
             SUM(CASE WHEN ua.id = t.account_to THEN t.amount ELSE 0 END) AS incoming,
-            SUM(CASE WHEN ua.id = t.account_from THEN t.amount ELSE 0 END) AS outgoing
+            SUM(CASE WHEN ua.id = t.account_from THEN t.amount ELSE 0 END) AS outgoing,
+            COUNT(DISTINCT CASE WHEN ua.id = t.account_from THEN strftime('%Y-%m-%d', t.trdate) END) AS days
         FROM transactions t
-        INNER JOIN user_accounts ua ON ua.id = t.account_from OR ua.id = t.account_to
-        WHERE ua.user_id = :user_id
-        GROUP BY month
+            INNER JOIN user_accounts ua ON ua.id = t.account_from OR ua.id = t.account_to
+            WHERE ua.user_id = :user_id
+            GROUP BY strftime('%m', t.trdate)
     ";
 
     // Request preparation

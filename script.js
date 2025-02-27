@@ -33,9 +33,11 @@ userForm.onsubmit = function (e) {
             const row = tableBody.insertRow();       
             const monthCell = row.insertCell();    
             const amountCell = row.insertCell();   
+            const countDays = row.insertCell();
 
             monthCell.textContent = item.month;  
             amountCell.textContent = item.balance; 
+            countDays.textContent = item.countDays;
         });
 
         // Updating the table header with the name of the selected user

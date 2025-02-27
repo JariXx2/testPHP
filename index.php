@@ -43,6 +43,7 @@ init_db($conn);
         <tr>
           <th>Month</th>
           <th>Amount</th>
+          <th>Count Days</th>
         </tr>
       </thead>
       <!-- The body of the table to be filled in with JavaScript -->

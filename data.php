@@ -18,18 +18,21 @@ if ($user_id) {
     // Getting user transaction data
     $transactions = get_user_transactions_balances($user_id, $conn, $month_names);
 
+
     // Forming an array of data for output
     $output_data = [];
     foreach ($month_names as $month_key => $month_name) {
         $month_data = [
             'month' => $month_name,
-            'balance' => '-'
+            'balance' => '-',
+            'countDays' => '-',
         ];
 
         foreach ($transactions as $transaction) {
             if ($transaction['month'] == $month_key) {
                 $balance = $transaction['incoming'] - $transaction['outgoing'];
                 $month_data['balance'] = number_format($balance, 2);
+                $month_data['countDays'] = $transaction["days"];
                 break; // The month has been found, we are exiting the internal cycle
             }
         }
